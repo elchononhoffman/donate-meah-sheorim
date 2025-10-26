@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Monthly Support</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <style>
+      body {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background: linear-gradient(135deg, #f5f6fa 0%, #e9ecf5 100%);
+        min-height: 100vh;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .card {
+        width: 100%;
+        max-width: 420px;
+        background: #ffffff;
+        border-radius: 20px;
+        box-shadow: 0 30px 60px rgba(0,0,0,0.08);
+        padding: 24px 24px 32px;
+        box-sizing: border-box;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .card::before {
+        content: "";
+        position: absolute;
+        top: -60px;
+        right: -60px;
+        width: 160px;
+        height: 160px;
+        background: radial-gradient(circle at 30% 30%, rgba(0,0,0,0.07) 0%, rgba(0,0,0,0) 70%);
+        border-radius: 50%;
+      }
+
+      header {
+        text-align: center;
+        margin-bottom: 16px;
+      }
+
+      .org-logo {
+        width: 64px;
+        height: 64px;
+        border-radius: 12px;
+        background: #222;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin: 0 auto 12px;
+      }
+
+      h2 {
+        margin: 0;
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #111;
+        text-align: center;
+      }
+
+      .tagline {
+        font-size: 0.9rem;
+        color: #555;
+        line-height: 1.3;
+        margin-top: 6px;
+        text-align: center;
+      }
+
+      .field-block {
+        margin-top: 18px;
+      }
+
+      label {
+        display: block;
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-bottom: 6px;
+        color: #222;
+      }
+
+      input[type="number"],
+      select,
+      textarea {
+        width: 100%;
+        font-size: 1rem;
+        padding: 10px 12px;
+        border-radius: 10px;
+        border: 1px solid #bbb;
+        box-sizing: border-box;
+        background: #fff;
+      }
+
+      button {
+        width: 100%;
+        margin-top: 20px;
+        background: #111;
+        color: #fff;
+        font-size: 1rem;
+        font-weight: 600;
+        padding: 12px 16px;
+        border-radius: 10px;
+        border: 0;
+        cursor: pointer;
+      }
+
+      button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      .legal {
+        margin-top: 16px;
+        font-size: 0.75rem;
+        color: #666;
+        line-height: 1.4;
+        text-align: center;
+      }
+
+      .msg {
+        margin-top: 12px;
+        color: red;
+        min-height: 1.2rem;
+        font-size: 0.8rem;
+        text-align: center;
+      }
+    </style>
+  </head>
+
+  <body>
+
+    <div class="card">
+      <header>
+        <!-- Replace this with your logo if you want -->
+        <div class="org-logo" id="orgLogoBox">ORG</div>
+
+        <!-- EDIT ORG NAME HERE -->
+        <h2 id="orgNameHeading">Meah Sheorim</h2>
+
+        <!-- EDIT TAGLINE HERE -->
+        <div class="tagline" id="orgTagline">
+          Monthly support to provide urgent assistance to families.
+        </div>
+      </header>
+
+      <!-- Monthly amount -->
+      <div class="field-block">
+        <label for="amountInput">Monthly amount</label>
+        <input id="amountInput" type="number" min="1" step="1" value="100" />
+      </div>
+
+      <!-- Number of payments -->
+      <div class="field-block">
+        <label for="monthsSelect">Number of monthly payments</label>
+        <select id="monthsSelect">
+          <option value="3">3 months</option>
+          <option value="6">6 months</option>
+          <option value="12" selected>12 months</option>
+        </select>
+      </div>
+
+      <!-- Donor note (optional box - you can hide this whole block per campaign) -->
+      <div class="field-block" id="noteBlock">
+        <label for="donorNote">Note / dedication (optional)</label>
+        <textarea id="donorNote" rows="3" placeholder="E.g. please use this for ..."></textarea>
+      </div>
+
+      <!-- FORM that will submit to Apps Script backend -->
+      <form id="donationForm" method="POST" action="https://script.google.com/macros/s/AKfycbzSybWkBtXGXR_dzOcYaKUePz4DhcOavXUQXBBi6TJw36qrE68SLWtV_fzzj6M0j6a5/exec">
+        <input type="hidden" name="idempotency_key" id="idempotency_key" />
+        <input type="hidden" name="amount" id="hidden_amount" />
+        <input type="hidden" name="installments" id="hidden_installments" />
+        <input type="hidden" name="donor_note" id="hidden_donor_note" />
+
+        <button type="submit" id="donateBtn">Continue to Secure Checkout</button>
+      </form>
+
+      <div class="msg" id="msg"></div>
+
+      <div class="legal" id="legalText">
+        Your card will be charged monthly for the number of months you select.
+        After that it stops automatically — no further charges.
+        You will be redirected to our secure payment provider (Stripe) to enter card details.
+      </div>
+    </div>
+
+    <script>
+      // Update the org "logo" initials box automatically
+      (function initOrgHeader() {
+        var orgName = document.getElementById('orgNameHeading').innerText;
+        document.getElementById('orgLogoBox').innerText =
+          orgName.substring(0,3).toUpperCase();
+      })();
+    </script>
+
+    <!-- Adjust the step for different currencies (match your CURRENCY Script Property) -->
+    <script>
+      // If CURRENCY is ILS, that’s 2 decimals → step 0.01.
+      // We'll support zero-decimal / three-decimal just like backend.
+      const ZERO_DEC = ['bif','clp','djf','gnf','jpy','kmf','krw','mga','pyg','rwf','ugx','vnd','vuv','xaf','xof','xpf'];
+      const THREE_DEC = ['bhd','jod','kwd','omr','tnd'];
+
+      // EDIT this to match the currency you set in Script Properties
+      const DISPLAY_CURRENCY = 'ils';
+
+      function stepFor(cur){
+        cur = (cur||'').toLowerCase();
+        if (ZERO_DEC.includes(cur)) return '1';
+        if (THREE_DEC.includes(cur)) return '0.001';
+        return '0.01';
+      }
+
+      const amountInputEl = document.getElementById('amountInput');
+      amountInputEl.step = stepFor(DISPLAY_CURRENCY);
+    </script>
+
+    <!-- Form logic -->
+    <script>
+      // stable idempotency key per page load
+      const IDEMP_KEY = (() => {
+        if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+        return 'idemp-' + Math.random().toString(36).slice(2) + '-' + Date.now();
+      })();
+
+      const formEl        = document.getElementById('donationForm');
+      const btn           = document.getElementById('donateBtn');
+      const msg           = document.getElementById('msg');
+      const monthsSelect  = document.getElementById('monthsSelect');
+      const donorNoteEl   = document.getElementById('donorNote'); // can be removed if not allowed
+
+      const hiddenAmount  = document.getElementById('hidden_amount');
+      const hiddenInst    = document.getElementById('hidden_installments');
+      const hiddenNote    = document.getElementById('hidden_donor_note');
+      const hiddenIdem    = document.getElementById('idempotency_key');
+
+      hiddenIdem.value = IDEMP_KEY;
+
+      formEl.addEventListener('submit', function(ev){
+        const rawAmount = document.getElementById('amountInput').value;
+        const amountVal = parseFloat(rawAmount);
+
+        if (!(amountVal > 0)) {
+          ev.preventDefault();
+          msg.textContent = 'Please enter a valid amount.';
+          return;
+        }
+
+        hiddenAmount.value = String(amountVal);
+        hiddenInst.value   = String(monthsSelect.value);
+        hiddenNote.value   = donorNoteEl ? donorNoteEl.value : "";
+
+        // disable button to prevent double submits
+        btn.disabled = true;
+        msg.textContent = '';
+      });
+    </script>
+
+  </body>
+</html>
